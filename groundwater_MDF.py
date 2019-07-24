@@ -6,14 +6,17 @@ Created on Fri Jun 28 14:10:40 2019
 """
 
 import numpy as np
-Lx=5000
-Ly=3000
+import matplotlib.pyplot as plt # combines namespace of numpy and pyplot
+
+###SIMULACION DE AGUAS SUBTERRANEA
+Lx=500
+Ly=300
 
 #Transmitivity
 T=500 # m2/dia
 
 nx=50
-ny=20
+ny=30
 
 dx=Lx/nx
 dy=Ly/ny
@@ -36,10 +39,14 @@ L=np.zeros(s)
 ho=np.zeros(s)
 
 #Condiciones de borde Q segun pozo
-#Q[20,10]=1000
-Q[10,15]=2000
-#Q[30,5]=2000
-#Q[40,5]=2000
+#Q[25,15]=2000
+#Q[25,15]=2289
+#Q[25,15]=2323
+#Q[25,15]=2376
+#Q[25,15]=2419
+#Q[25,15]=2462
+Q[25,15]=2505
+
 #Condiciones de borde ho
 L+=0.00002
 
@@ -66,31 +73,49 @@ for k in range(1,1000):
                     h[i][j]=((h[i][j-1]+h[i-1][j])/(3+L[i][j]*dx**2/T)-(Q[i][j]-L[i][j]*ho[i][j]*dx**2)/(3*T+L[i][j]*dx**2))
     
     ho=h        
+np.savetxt('h_groundwater.dat', h, fmt='%.4e')
 
-import matplotlib.pyplot as plt # combines namespace of numpy and pyplot
-
+#Plotting##########
+figura=plt.figure(1) 
 plt.clf()
-plt.subplot(2,2,1)
 cs=plt.contour(h)
 #plt.colorbar()
 plt.xlabel('y [m]')
 plt.ylabel('x [m]')
-plt.title("Curvas")
+plt.title("Superficie de nivel freatico")
 plt.clabel(cs, inline=0.5, fontsize=8)
+plt.savefig('D:/PYTHON/Groundwater/Contour.png', dpi=1800)
 
-plt.subplot(2,2,2)
+figura=plt.figure(2)
 plt.contour(h)
 plt.contourf(h,8,alpha=1,cmap='jet')
 plt.colorbar()
 plt.xlabel('y [m]')
-#plt.ylabel('x [m]')
-plt.title("Curvas")
+plt.ylabel('x [m]')
+plt.title("Mapa de nivel freatico")
+plt.savefig('D:/PYTHON/Groundwater/Mapping.png', dpi=1800)
 
-plt.savefig('E:/A.-TESIS_MAESTRÍA/CICLO 2019-I/TE-Groundwater/imagen.png', dpi=1800)
+# Guardar datos en archivo CSV
 
-fig = plt.figure()
-ax = plt.axes(projection='3d')
-ax.plot_surface(nx,ny,h,cmap='jet')
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.set_zlabel('z')
+# Filtrado de Datos para el pozo
+h_pozox=h[:,15]
+h_pozoy=h[25,:]  
+
+#Ploteo seccion X-X
+figura=plt.figure(3) 
+plt.clf()
+plt.plot(h_pozox)
+plt.xlabel('x [m]')
+plt.ylabel('h [m]')
+plt.title("Cross Section x-x")
+plt.savefig('D:/PYTHON/Groundwater/section2d_x-x.png', dpi=1800)
+
+#Ploteo seccion Y-Y
+figura=plt.figure(4) 
+fig=plt.plot(h_pozoy)
+plt.xlabel('y [m]')
+plt.ylabel('h [m]')
+plt.title("Cross Section y-y")
+
+plt.savefig('D:/PYTHON/Groundwater/section2d_y-y.png', dpi=1800)
+
